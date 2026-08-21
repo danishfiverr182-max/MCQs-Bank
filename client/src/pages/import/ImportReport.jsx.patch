@@ -1,0 +1,67 @@
+diff --git a/client/src/pages/import/ImportReport.jsx b/client/src/pages/import/ImportReport.jsx
+index dec4690..4539184 100644
+--- a/client/src/pages/import/ImportReport.jsx
++++ b/client/src/pages/import/ImportReport.jsx
+@@ -9,7 +9,7 @@
+ // batch_id is a natural Phase 5+ enhancement (see the note above
+ // ImportHistory.jsx's row-click modal for the same reasoning).
+ 
+-import { useMemo, useState } from 'react';
++import { useEffect, useMemo, useState } from 'react';
+ import { useLocation, useNavigate, Link } from 'react-router-dom';
+ import toast from 'react-hot-toast';
+ import { Button } from '@/components/ui/button';
+@@ -69,6 +69,29 @@ export default function ImportReport() {
+   // in anything resolveDuplicates reports too.
+   const [newSubtopics, setNewSubtopics] = useState(() => report?.newSubtopics ?? []);
+ 
++  // "Prompt updated" banner — only meaningful after a real insert (a
++  // dry run/validate_only always has report.inserted === 0, since
++  // nothing is ever written for one of those — see import.service.js's
++  // buildReport). The server is the source of truth for the new
++  // range, so this fetches the current prompt-state fresh on mount
++  // rather than trying to derive X–Y client-side.
++  const [promptRange, setPromptRange] = useState(null);
++  const [isPromptBannerDismissed, setIsPromptBannerDismissed] = useState(false);
++
++  useEffect(() => {
++    if (!report) return;
++    api
++      .get('/import/prompt-state')
++      .then((response) => {
++        const data = response.data?.data;
++        if (data) setPromptRange({ rangeStart: data.rangeStart, rangeEnd: data.rangeEnd });
++      })
++      .catch(() => {
++        // Non-critical — the banner simply won't render without a range.
++      });
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, []);
++
+   const duplicateEntries = useMemo(() => {
+     if (!report) return [];
+     return [...(report.duplicates?.exact ?? []), ...(report.duplicates?.near ?? [])];
+@@ -192,6 +215,23 @@ export default function ImportReport() {
+         </div>
+       </div>
+ 
++      {report.inserted > 0 && promptRange && !isPromptBannerDismissed && (
++        <div className="card flex items-center justify-between bg-primary-light border-primary-200 py-3">
++          <p className="text-sm text-primary-700">
++            Prompt updated — {newSubtopics.length} new subtopic{newSubtopics.length === 1 ? '' : 's'}{' '}
++            added to the bank, next batch is now {promptRange.rangeStart}–{promptRange.rangeEnd}.
++          </p>
++          <button
++            type="button"
++            onClick={() => setIsPromptBannerDismissed(true)}
++            aria-label="Dismiss"
++            className="text-primary-700 hover:text-primary-900 text-sm font-medium ml-4"
++          >
++            Dismiss
++          </button>
++        </div>
++      )}
++
+       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+         {stats.map((stat) => (
+           <div key={stat.label} className="card p-4">

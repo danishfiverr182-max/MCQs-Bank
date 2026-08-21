@@ -1,0 +1,55 @@
+diff --git a/server/src/services/import.service.js b/server/src/services/import.service.js
+index dc289cb..cba5413 100644
+--- a/server/src/services/import.service.js
++++ b/server/src/services/import.service.js
+@@ -7,6 +7,7 @@ import TaxonomyNode from '../models/TaxonomyNode.js';
+ import { slugify } from '../utils/slugify.js';
+ import { logger } from '../utils/logger.js';
+ import { ensureTaxonomyNodesExist } from './mcq.service.js';
++import { mergeSubtopicsIntoBank, advanceRange } from './promptState.service.js';
+ 
+ // ─── ensureTaxonomyForInsertedDocs ────────────────────────────────
+ // Same gap as createMcq/updateMcq in mcq.service.js (see
+@@ -445,6 +446,17 @@ export const resolveDuplicateInserts = async (
+     batch.batch_id
+   );
+ 
++  // Best-effort, mirrors the runImportPipeline hook below — a reviewed
++  // "keep" decision can still introduce genuinely new subtopics, so the
++  // MCQ Conversion Prompt's subtopic bank should pick those up too.
++  // Range only advances once per import (in runImportPipeline itself),
++  // not per resolve, so advanceRange is deliberately NOT called here.
++  try {
++    await mergeSubtopicsIntoBank(newSubtopics);
++  } catch (err) {
++    logger.warn(`resolveDuplicateInserts: mergeSubtopicsIntoBank failed: ${err.message}`);
++  }
++
+   batch.inserted_count += insertedCount;
+   // A "keep" decision on a reviewed duplicate can, in rare cases,
+   // still introduce a genuinely new Subtopic (e.g. a near-duplicate
+@@ -683,5 +695,24 @@ export const runImportPipeline = async (
+     await session.endSession();
+   }
+ 
++  // MCQ Conversion Prompt auto-advance (purely additive — see
++  // promptState.service.js). The import has already committed
++  // successfully at this point (the transaction above either fully
++  // succeeded or threw and was rethrown), so these run outside any
++  // transaction and are each independently best-effort: a failure here
++  // must never turn a successful import into a failed one.
++  if (mode === 'insert') {
++    try {
++      await mergeSubtopicsIntoBank(report.newSubtopics ?? []);
++    } catch (err) {
++      logger.warn(`runImportPipeline: mergeSubtopicsIntoBank failed: ${err.message}`);
++    }
++    try {
++      await advanceRange();
++    } catch (err) {
++      logger.warn(`runImportPipeline: advanceRange failed: ${err.message}`);
++    }
++  }
++
+   return { ...report, batch_id: batch.batch_id };
+ };

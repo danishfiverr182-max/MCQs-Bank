@@ -1,0 +1,23 @@
+diff --git a/client/src/pages/import/BulkImport.jsx b/client/src/pages/import/BulkImport.jsx
+index ce0db69..77c4a8b 100644
+--- a/client/src/pages/import/BulkImport.jsx
++++ b/client/src/pages/import/BulkImport.jsx
+@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
+ import DropZone from '@/components/import/DropZone';
+ import ImportProgressBar from '@/components/import/ImportProgressBar';
+ import PasteJsonModal from '@/components/import/PasteJsonModal';
++import ConversionPromptPanel from '@/components/import/ConversionPromptPanel';
+ import api, { handleApiError } from '@/lib/axios';
+ 
+ const SCHEMA_EXAMPLE = `{
+@@ -201,6 +202,10 @@ export default function BulkImport() {
+         </p>
+       </div>
+ 
++      {/* Collapsed by default — the range/bank badges stay glanceable in
++          the header row without pushing the upload form down. */}
++      <ConversionPromptPanel />
++
+       {/* Collapsible schema hint — collapsed by default */}
+       <div className="card p-0 overflow-hidden">
+         <button

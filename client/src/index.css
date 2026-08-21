@@ -1,0 +1,113 @@
+/* ── Google Fonts ─────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── Tailwind directives ─────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Custom Properties ───────────────────────────── */
+/* These power ShadCN components and can be referenced anywhere */
+:root {
+  /* Brand */
+  --primary:           220 90% 56%;   /* HSL for ShadCN compatibility */
+  --primary-foreground: 0 0% 100%;
+
+  /* Surface */
+  --background:    210 40% 98%;       /* #F8FAFC */
+  --foreground:    222 47% 11%;       /* #0F172A */
+  --card:          0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  /* Border */
+  --border:        214 32% 91%;       /* #E2E8F0 */
+  --input:         214 32% 91%;
+  --ring:          220 90% 56%;
+
+  /* Sidebar */
+  --sidebar-bg:    222 47% 11%;       /* #0F172A — Dark slate */
+  --sidebar-text:  215 20% 65%;       /* Muted text on dark sidebar */
+  --sidebar-text-active: 0 0% 100%;   /* White for active item */
+  --sidebar-hover: 217 32% 17%;       /* Subtle hover on sidebar */
+  --sidebar-border: 217 32% 17%;
+
+  /* Topbar */
+  --topbar-bg:     0 0% 100%;
+  --topbar-border: 214 32% 91%;
+
+  /* Status */
+  --success:       160 84% 39%;       /* #10B981 */
+  --warning:       38 92% 50%;        /* #F59E0B */
+  --danger:        0 84% 60%;         /* #EF4444 */
+
+  /* Radius — used by ShadCN */
+  --radius: 0.5rem;
+}
+
+/* ── Base styles ─────────────────────────────────────── */
+@layer base {
+  * {
+    box-sizing: border-box;
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.3;
+    color: hsl(var(--foreground));
+  }
+}
+
+/* ── Component utilities ─────────────────────────────── */
+@layer components {
+  /* Page wrapper — used by all dashboard pages */
+  .page-wrapper {
+    @apply p-6 space-y-6;
+  }
+
+  /* Card — white container with shadow */
+  .card {
+    @apply bg-white rounded-lg shadow-card border border-surface-border p-6;
+  }
+
+  /* Section title inside pages */
+  .section-title {
+    @apply text-subhead text-gray-900 font-semibold;
+  }
+
+  /* Table styles */
+  .data-table {
+    @apply w-full text-sm text-left;
+  }
+  .data-table th {
+    @apply px-4 py-3 text-xs font-semibold uppercase tracking-wider
+           text-gray-500 bg-gray-50 border-b border-gray-200;
+  }
+  .data-table td {
+    @apply px-4 py-3 border-b border-gray-100 text-gray-700;
+  }
+  .data-table tr:hover td {
+    @apply bg-gray-50;
+  }
+
+  /* Badge variants (difficulty / status) */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-label font-medium;
+  }
+  .badge-easy     { @apply bg-easy-light text-easy-text; }
+  .badge-medium   { @apply bg-medium-light text-medium-text; }
+  .badge-hard     { @apply bg-hard-light text-hard-text; }
+  .badge-approved { @apply bg-approved-light text-approved-text; }
+  .badge-pending  { @apply bg-pending-light text-pending-text; }
+  .badge-rejected { @apply bg-rejected-light text-rejected-text; }
+}
