@@ -5,8 +5,15 @@
 
 import axios from 'axios';
 
+// In dev, Vite's proxy forwards '/api' to http://localhost:5001 (see
+// vite.config.js). In production there is no such proxy, so we need
+// the real backend origin — set VITE_API_URL in Netlify's environment
+// variables to your Railway backend URL, e.g.
+// https://mcqs-bank-production.up.railway.app (no trailing slash).
 const api = axios.create({
-  baseURL: '/api', // Vite dev-server proxy forwards this to http://localhost:5000
+  baseURL: import.meta.env.VITE_API_URL
+    ? `${import.meta.env.VITE_API_URL}/api`
+    : '/api',
   withCredentials: true, // required for httpOnly cookies (Phase 2 auth)
   timeout: 10000,
   headers: {
