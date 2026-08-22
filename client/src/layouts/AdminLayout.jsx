@@ -62,7 +62,7 @@ export default function AdminLayout() {
     <div className="min-h-screen flex bg-surface">
       {/* Sidebar */}
       <aside className="w-sidebar shrink-0 bg-sidebar-bg text-sidebar-text flex flex-col">
-        <div className="h-topbar flex items-center px-6 text-white font-semibold">
+        <div className="h-topbar flex items-center px-10 text-black font-bold">
           🔧 ExamEngine
         </div>
         <nav className="flex-1 px-3 space-y-1">
@@ -118,7 +118,7 @@ export default function AdminLayout() {
       {/* Main column */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar */}
-        <header className="h-topbar bg-topbar-bg border-b border-topbar-border flex items-center justify-end px-6 gap-4">
+        <header className="h-topbar bg-topbar-bg border-b border-topbar-border flex items-center justify-end px-10 gap-4">
           <span className="text-sm text-gray-600">{user?.email}</span>
         </header>
 
